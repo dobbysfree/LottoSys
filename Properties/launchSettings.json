@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LottoAlgo": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
