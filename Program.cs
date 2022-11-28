@@ -26,7 +26,7 @@ namespace LottoSys
 
             DB.SelectSingle("SELECT * FROM tb_win_num ORDER BY idx;");
 
-            //if (bool.Parse(IConf["ActiveCraw"])) CrawWeb.Get();
+            if (bool.Parse(IConf["ActiveCraw"])) CrawWeb.Get();
             
             FindGame();
         }
@@ -61,7 +61,7 @@ namespace LottoSys
             int missNum = 5;
             int minSum = 110;
             StringBuilder sb = new StringBuilder();
-            string date = DateTime.Now.AddDays(6).ToString("yyyy-MM-dd");
+            string date = DateTime.Now.AddDays(CnvtDate()).ToString("yyyy-MM-dd");
 
             List<string> GameNum = new List<string>();
             foreach (var pos in positions)
@@ -90,7 +90,7 @@ namespace LottoSys
                     {
                         Console.WriteLine($"SET > {str} > {sum}");
                         GameNum.Add(str);
-                        sb.AppendLine($"INSERT INTO tb_game VALUES ('{date}', {str});");
+                        //sb.AppendLine($"INSERT INTO tb_game VALUES ('{date}', {str});");
                         break;
                     }
                     else
@@ -98,7 +98,7 @@ namespace LottoSys
                         missNum--;
                         if (missNum == 0) 
                         {
-                            minSum -= 5;
+                            minSum -= 10;
                             missNum = 5;
                         }
                     }
@@ -132,7 +132,7 @@ namespace LottoSys
                 var extraPos = rankPos[new Random().Next(rankPos.Count)];
 
 
-                while (GameNum.Count == GameCount)
+                while (true)
                 {
                     List<int> game = new List<int>();
                     string[] ky = extraPos.Key.Split('-');
@@ -152,8 +152,8 @@ namespace LottoSys
                         }
                     }
 
-                    int sum = game.Sum();
-                    string str = string.Join(',', game);
+                    int sum     = game.Sum();
+                    string str  = string.Join(',', game);
 
                     if (WinNums.Where(x => x.StrNums == str).Count() == 0 && !GameNum.Contains(str))
                     {
@@ -161,8 +161,10 @@ namespace LottoSys
                         GameNum.Add(str);
                         sb.AppendLine($"INSERT INTO tb_game VALUES ('{date}', {str});");
                     }
-                }
 
+                    if (GameNum.Count == 10) break;
+                }
+                                
                 if (GameNum.Count > 0) DB.Execute(sb.ToString());
             }
             catch (Exception)
@@ -171,5 +173,21 @@ namespace LottoSys
             }  
         }
         #endregion
+
+        static int CnvtDate()
+        {
+            int i = 0;
+            switch (DateTime.Now.DayOfWeek)
+            {
+                case DayOfWeek.Monday:      i = 5; break;
+                case DayOfWeek.Tuesday:     i = 4; break;
+                case DayOfWeek.Wednesday:   i = 3; break;
+                case DayOfWeek.Thursday:    i = 2; break;
+                case DayOfWeek.Friday:      i = 1; break;
+                case DayOfWeek.Saturday:    i = 0; break;
+                case DayOfWeek.Sunday:      i = 6; break;
+            }
+            return i;
+        }
     }
 }

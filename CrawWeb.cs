@@ -20,8 +20,8 @@ namespace LottoSys
             if (nodes == null) return;
 
             WinNum wn   = new WinNum();
-            wn.Idx      = Program.WinNums.Count + 1;
-            wn.Date     = DateTime.Now.AddDays(-1);
+            wn.Idx      = Program.WinNums.Count + 1;            
+            wn.Date     = DateTime.Now.AddDays(CnvtDate());
 
             var nums = nodes.InnerText.Trim().Split(' ');
             for (int y = 0; y < 6; y++)
@@ -55,6 +55,22 @@ namespace LottoSys
             DB.Execute(sb.ToString());
 
             Program.WinNums.Add(wn);
+        }
+
+        static int CnvtDate()
+        {
+            int i = 0;
+            switch (DateTime.Now.DayOfWeek)
+            {
+                case DayOfWeek.Monday:      i = -2; break;
+                case DayOfWeek.Tuesday:     i = -3; break;
+                case DayOfWeek.Wednesday:   i = -4; break;
+                case DayOfWeek.Thursday:    i = -5; break;
+                case DayOfWeek.Friday:      i = -6; break;
+                case DayOfWeek.Saturday:    i = 0; break;
+                case DayOfWeek.Sunday:      i = -1; break;
+            }
+            return i;
         }
     }
 }
